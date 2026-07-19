@@ -1,0 +1,299 @@
+# LAB4
+# REMINDER: The work in this assignment must be your own original work and must be completed alone.
+
+class Node:   # You are not allowed to modify this class
+    def __init__(self, value=None):  
+        self.next = None
+        self.value = value
+    
+    def __str__(self):
+        return f"Node({self.value})"
+
+    __repr__ = __str__
+
+class Malloc_Library:
+
+    """
+    ** This is NOT a comprehensive test sample, test beyond this doctest
+        >>> lst = Malloc_Library()
+        >>> lst
+        <BLANKLINE>
+        >>> lst.malloc(5)
+        >>> lst
+        None -> None -> None -> None -> None
+        >>> lst[0] = 23
+        >>> lst
+        23 -> None -> None -> None -> None
+        >>> lst[0]
+        23
+        >>> lst[1]
+        >>> lst.realloc(1)
+        >>> lst
+        23
+        >>> lst.calloc(5)
+        >>> lst
+        0 -> 0 -> 0 -> 0 -> 0
+        >>> lst.calloc(10)
+        >>> lst[3] = 5
+        >>> lst[8] = 23
+        >>> lst
+        0 -> 0 -> 0 -> 5 -> 0 -> 0 -> 0 -> 0 -> 23 -> 0
+        >>> lst.realloc(5)
+        >>> lst
+        0 -> 0 -> 0 -> 5 -> 0
+        >>> other_lst = Malloc_Library()
+        >>> other_lst.realloc(9)
+        >>> other_lst[0] = 12
+        >>> other_lst[5] = 56
+        >>> other_lst[8] = 6925
+        >>> other_lst[10] = 78
+        Traceback (most recent call last):
+            ...
+        IndexError
+        >>> other_lst.memcpy(2, lst, 0, 5)
+        >>> lst
+        None -> None -> None -> 56 -> None
+        >>> other_lst
+        12 -> None -> None -> None -> None -> 56 -> None -> None -> 6925
+        >>> temp = lst.head.next.next
+        >>> lst.free()
+        >>> temp.next is None
+        True
+    """
+
+    def __init__(self): # You are not allowed to modify the constructor
+        self.head = None
+    
+    def __repr__(self):  # You are not allowed to modify this method
+        current = self.head
+        out = []
+        while current != None:
+            out.append(str(current.value))
+            current = current.next
+        return " -> ".join(out)
+
+    __str__ = __repr__
+    
+    def __len__(self):
+        # Task for program: Count how many nodes are inside our linked list
+        # Input: The current list object
+        # Output: An integer representing total node count
+        
+        # Start a counter at zero
+        count = 0
+        # Start checking from the very front node
+        current = self.head
+        
+        # Keep moving forward until we run out of nodes
+        while current is not None:
+            count += 1
+            current = current.next
+            
+        return count
+
+    
+    def __setitem__(self, pos, value):
+        # Task for program: Find a node at a specific slot and update its value
+        # Input: A target index position and a new value
+        # Output: None
+        
+        # Stop and throw an index error if the index number is invalid or out of bounds
+        if pos < 0 or pos >= len(self):
+            raise IndexError()
+        
+        # Walk up to the requested position
+        current = self.head
+        index = 0
+        while index < pos:
+            assert current is not None  # Reassure the IDE type checker
+            current = current.next
+            index += 1
+            
+        # Swap out the old value with the new one
+        assert current is not None      # Reassure the IDE type checker
+        current.value = value
+
+
+    def __getitem__(self, pos):
+        # Task for program: Retrieve the value stored inside a node at a specific position
+        # Input: A target index position
+        # Output: The data value stored at that index position
+        
+        # If the list is completely blank, return None immediately
+        if self.head is None:
+            return None
+            
+        # Stop and throw an error if the index number is out of bounds
+        if pos < 0 or pos >= len(self):
+            raise IndexError()
+            
+        # Walk up to the requested position
+        current = self.head
+        index = 0
+        while index < pos:
+            assert current is not None  # Reassure the IDE type checker
+            current = current.next
+            index += 1
+            
+        # Give back the value found inside that node
+        assert current is not None      # Reassure the IDE type checker
+        return current.value
+    
+
+    def malloc(self, size):
+        # Task for program: Build a brand new linked list chain filled with None values
+        # Input: A positive integer size for the chain
+        # Output: None
+        
+        # If size is invalid, stop immediately
+        if size <= 0:
+            self.free()
+            return
+            
+        # Establish the very first front node
+        self.head = Node(None)
+        current = self.head
+        
+        # Chain together the remaining nodes one by one
+        count = 1
+        while count < size:
+            assert current is not None  # Reassure the IDE type checker
+            current.next = Node(None)
+            current = current.next
+            count += 1
+
+
+    def calloc(self, size):
+        # Task for program: Build a brand new linked list chain filled entirely with zeros
+        # Input: A positive integer size for the chain
+        # Output: None
+        
+        # If size is invalid, stop immediately
+        if size <= 0:
+            self.free()
+            return
+            
+        # Establish the very first front node with a zero
+        self.head = Node(0)
+        current = self.head
+        
+        # Chain together the remaining nodes filled with zeros
+        count = 1
+        while count < size:
+            assert current is not None  # Reassure the IDE type checker
+            current.next = Node(0)
+            current = current.next
+            count += 1
+
+
+    def free(self):
+        # Task for program: Break apart every individual link between nodes to clear memory
+        # Input: The list object
+        # Output: None
+        
+        # Hold onto the front node first
+        current = self.head
+        # Sever the main head pointer entirely
+        self.head = None
+        
+        # Disconnect every single node link one by one so they are completely unlinked
+        while current is not None:
+            next_node = current.next
+            current.next = None
+            current = next_node
+
+
+    def realloc(self, size):
+        # Task for program: Shrink or grow our list chain to match a new specified size
+        # Input: A non-negative integer size
+        # Output: None
+        
+        current_len = len(self)
+        
+        # Strategy Step 1: If target size is 0, completely clear the list out
+        if size == 0:
+            self.free()
+            return
+            
+        # Strategy Step 2: If the list is empty, behave exactly like malloc
+        if current_len == 0:
+            self.malloc(size)
+            return
+            
+        # Strategy Step 3: If growing, travel to the end and stitch on extra None nodes
+        if size > current_len:
+            current = self.head
+            assert current is not None  # Reassure the IDE type checker
+            while current.next is not None:
+                current = current.next
+                
+            needed = size - current_len
+            while needed > 0:
+                assert current is not None  # Reassure the IDE type checker
+                current.next = Node(None)
+                current = current.next
+                needed -= 1
+                
+        # Strategy Step 4: If shrinking, find the cutoff point and unlink all tail nodes
+        elif size < current_len:
+            current = self.head
+            index = 1
+            while index < size:
+                assert current is not None  # Reassure the IDE type checker
+                current = current.next
+                index += 1
+                
+            # Isolate the remaining chain pieces and break the connection
+            assert current is not None      # Reassure the IDE type checker
+            to_disconnect = current.next
+            current.next = None
+            
+            # Unlink the leftover nodes cleanly one by one
+            while to_disconnect is not None:
+                next_node = to_disconnect.next
+                to_disconnect.next = None
+                to_disconnect = next_node
+
+
+    def memcpy(self, ptr1_start_idx, pointer_2, ptr2_start_idx, size):
+        # Task for program: Copy segment values from our list over into a target second list
+        # Input: Starting index from source, destination list, starting index for destination, and a copy size
+        # Output: None
+        
+        len1 = len(self)
+        len2 = len(pointer_2)
+        
+        # Strategy Step 1: If either start index is out of bounds, do nothing
+        if ptr1_start_idx >= len1 or ptr2_start_idx >= len2:
+            return
+            
+        # Strategy Step 2: Walk up to the starting slot in the original source list
+        curr1 = self.head
+        idx1 = 0
+        while idx1 < ptr1_start_idx and curr1 is not None:
+            curr1 = curr1.next
+            idx1 += 1
+            
+        # Strategy Step 3: Walk up to the starting slot in the target destination list
+        curr2 = pointer_2.head
+        idx2 = 0
+        while idx2 < ptr2_start_idx and curr2 is not None:
+            curr2 = curr2.next
+            idx2 += 1
+            
+        # Strategy Step 4: Overwrite matching slots without exceeding size limits or ending nodes
+        copied = 0
+        while copied < size and curr1 is not None and curr2 is not None:
+            curr2.value = curr1.value
+            curr1 = curr1.next
+            curr2 = curr2.next
+            copied += 1
+    
+
+def run_tests():
+    import doctest
+    doctest.testmod(verbose=True)
+     
+
+if __name__ == "__main__":
+     run_tests()
