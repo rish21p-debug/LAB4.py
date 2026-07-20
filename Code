@@ -97,7 +97,7 @@ class Malloc_Library:
         # Input: A target index position and a new value
         # Output: None
         
-        # Stops and throw an index error if the index number is invalid or out of bounds
+        # Stops and raises an index error if the index number is invalid or out of bounds
         if pos < 0 or pos >= len(self):
             raise IndexError()
         
