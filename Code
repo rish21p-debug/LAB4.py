@@ -75,16 +75,16 @@ class Malloc_Library:
     __str__ = __repr__
     
     def __len__(self):
-        # Task for program: Count how many nodes are inside our linked list
+        # Task: Count how many nodes are inside our linked list
         # Input: The current list object
         # Output: An integer representing total node count
         
-        # Start a counter at zero
+        # Starts a counter at zero
         count = 0
-        # Start checking from the very front node
+        # Starts checking from the front node
         current = self.head
         
-        # Keep moving forward until we run out of nodes
+        # Keeps on moving forward until the nodes run out
         while current is not None:
             count += 1
             current = current.next
@@ -97,20 +97,20 @@ class Malloc_Library:
         # Input: A target index position and a new value
         # Output: None
         
-        # Stop and throw an index error if the index number is invalid or out of bounds
+        # Stops and throw an index error if the index number is invalid or out of bounds
         if pos < 0 or pos >= len(self):
             raise IndexError()
         
-        # Walk up to the requested position
+        # Goes to the specified position
         current = self.head
         index = 0
         while index < pos:
-            assert current is not None  # Reassure the IDE type checker
+            assert current is not None 
             current = current.next
             index += 1
             
-        # Swap out the old value with the new one
-        assert current is not None      # Reassure the IDE type checker
+        # Swaps out the old value with the new one
+        assert current is not None     
         current.value = value
 
 
@@ -119,24 +119,24 @@ class Malloc_Library:
         # Input: A target index position
         # Output: The data value stored at that index position
         
-        # If the list is completely blank, return None immediately
+        # If the list is empty, returns None
         if self.head is None:
             return None
             
-        # Stop and throw an error if the index number is out of bounds
+        # Stops and raises an error if the index number is out of bounds
         if pos < 0 or pos >= len(self):
             raise IndexError()
             
-        # Walk up to the requested position
+        # Goes to the specified position
         current = self.head
         index = 0
         while index < pos:
-            assert current is not None  # Reassure the IDE type checker
+            assert current is not None  
             current = current.next
             index += 1
             
-        # Give back the value found inside that node
-        assert current is not None      # Reassure the IDE type checker
+        # Returns the value found inside the node
+        assert current is not None     
         return current.value
     
 
@@ -145,19 +145,19 @@ class Malloc_Library:
         # Input: A positive integer size for the chain
         # Output: None
         
-        # If size is invalid, stop immediately
+        # If size is invalid, the function stops
         if size <= 0:
             self.free()
             return
             
-        # Establish the very first front node
+        # Specifies the very first front node
         self.head = Node(None)
         current = self.head
         
-        # Chain together the remaining nodes one by one
+        # Chains together the remaining nodes one by one
         count = 1
         while count < size:
-            assert current is not None  # Reassure the IDE type checker
+            assert current is not None
             current.next = Node(None)
             current = current.next
             count += 1
@@ -168,19 +168,19 @@ class Malloc_Library:
         # Input: A positive integer size for the chain
         # Output: None
         
-        # If size is invalid, stop immediately
+        # If size is invalid, the function stops
         if size <= 0:
             self.free()
             return
             
-        # Establish the very first front node with a zero
+        # Specifies the very first front node with a zero
         self.head = Node(0)
         current = self.head
         
-        # Chain together the remaining nodes filled with zeros
+        # Chains together the remaining nodes that are filled with zeros
         count = 1
         while count < size:
-            assert current is not None  # Reassure the IDE type checker
+            assert current is not None 
             current.next = Node(0)
             current = current.next
             count += 1
@@ -191,12 +191,12 @@ class Malloc_Library:
         # Input: The list object
         # Output: None
         
-        # Hold onto the front node first
+        # Holds onto the front node first
         current = self.head
-        # Sever the main head pointer entirely
+        # Removes the main head pointer entirely
         self.head = None
         
-        # Disconnect every single node link one by one so they are completely unlinked
+        # Disconnects every single node link one at a time so they are completely unlinked
         while current is not None:
             next_node = current.next
             current.next = None
@@ -210,45 +210,45 @@ class Malloc_Library:
         
         current_len = len(self)
         
-        # Strategy Step 1: If target size is 0, completely clear the list out
+        # If target size is 0, returns nothing
         if size == 0:
             self.free()
             return
             
-        # Strategy Step 2: If the list is empty, behave exactly like malloc
+        # Checks if the list is empty
         if current_len == 0:
             self.malloc(size)
             return
             
-        # Strategy Step 3: If growing, travel to the end and stitch on extra None nodes
+        # If the size is growing, go to the end and add on extra None nodes
         if size > current_len:
             current = self.head
-            assert current is not None  # Reassure the IDE type checker
+            assert current is not None  
             while current.next is not None:
                 current = current.next
                 
             needed = size - current_len
             while needed > 0:
-                assert current is not None  # Reassure the IDE type checker
+                assert current is not None  
                 current.next = Node(None)
                 current = current.next
                 needed -= 1
                 
-        # Strategy Step 4: If shrinking, find the cutoff point and unlink all tail nodes
+        # If list is shrinking, go to the cutoff point and unlink all tail nodes
         elif size < current_len:
             current = self.head
             index = 1
             while index < size:
-                assert current is not None  # Reassure the IDE type checker
+                assert current is not None  
                 current = current.next
                 index += 1
                 
-            # Isolate the remaining chain pieces and break the connection
-            assert current is not None      # Reassure the IDE type checker
+            # Isolates the remaining chain pieces and break the connection
+            assert current is not None      
             to_disconnect = current.next
             current.next = None
             
-            # Unlink the leftover nodes cleanly one by one
+            # Unlinks the leftover nodes one at a time
             while to_disconnect is not None:
                 next_node = to_disconnect.next
                 to_disconnect.next = None
@@ -263,25 +263,24 @@ class Malloc_Library:
         len1 = len(self)
         len2 = len(pointer_2)
         
-        # Strategy Step 1: If either start index is out of bounds, do nothing
+        # Checks if either start index is out of bounds
         if ptr1_start_idx >= len1 or ptr2_start_idx >= len2:
             return
             
-        # Strategy Step 2: Walk up to the starting slot in the original source list
+        # Goes to the starting slot in the original source list
         curr1 = self.head
         idx1 = 0
         while idx1 < ptr1_start_idx and curr1 is not None:
             curr1 = curr1.next
             idx1 += 1
             
-        # Strategy Step 3: Walk up to the starting slot in the target destination list
+        # Goes to the starting slot in the target list
         curr2 = pointer_2.head
         idx2 = 0
         while idx2 < ptr2_start_idx and curr2 is not None:
             curr2 = curr2.next
             idx2 += 1
             
-        # Strategy Step 4: Overwrite matching slots without exceeding size limits or ending nodes
         copied = 0
         while copied < size and curr1 is not None and curr2 is not None:
             curr2.value = curr1.value
